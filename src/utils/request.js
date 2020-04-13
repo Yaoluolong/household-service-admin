@@ -11,7 +11,7 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     if (store.getters.token) {
-      config.headers['X-Token'] = getToken()
+      config.headers['Authorization'] = `Bearer ${getToken()}`
     }
     return config
   },
@@ -25,15 +25,14 @@ service.interceptors.response.use(
 
   response => {
     const res = response.data
-
-    if (res.code !== 20000) {
+    if (res.code !== 0) {
       Message({
-        message: res.message || 'Error',
+        message: res.msg || '连接错误',
         type: 'error',
         duration: 5 * 1000
       })
 
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+      if (res.code === -2) {
         MessageBox.confirm('token已失效，是否重新登录', '确认注销', {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
@@ -44,15 +43,15 @@ service.interceptors.response.use(
           })
         })
       }
-      return Promise.reject(new Error(res.message || 'Error'))
+      return Promise.reject(new Error(res.msg || '连接错误'))
     } else {
       return res
     }
   },
   error => {
-    console.log('err' + error)
+    const { msg } = error.response.data
     Message({
-      message: error.message,
+      message: msg || '连接错误',
       type: 'error',
       duration: 5 * 1000
     })
