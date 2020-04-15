@@ -5,6 +5,10 @@
   font-weight: 400 !important;
 }
 
+.el-breadcrumb__inner a:hover {
+  color:#4bd396;
+}
+
 .el-upload {
   input[type="file"] {
     display: none !important;

@@ -19,9 +19,13 @@ import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 
+import AppLayout from './components/AppLayout'
+
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
 })
+
+Vue.use(AppLayout)
 
 // register global utility filters
 Object.keys(filters).forEach(key => {
