@@ -12,6 +12,7 @@ service.interceptors.request.use(
   config => {
     if (store.getters.token) {
       config.headers['Authorization'] = `Bearer ${getToken()}`
+      console.log(config)
     }
     return config
   },
@@ -28,7 +29,7 @@ service.interceptors.response.use(
     if (res.code !== 0) {
       Message({
         message: res.msg || '连接错误',
-        type: 'error',
+        type: 'success',
         duration: 5 * 1000
       })
 
@@ -49,12 +50,24 @@ service.interceptors.response.use(
     }
   },
   error => {
-    const { msg } = error.response.data
-    Message({
-      message: msg || '连接错误',
-      type: 'error',
-      duration: 5 * 1000
-    })
+    const { msg, code } = error.response.data
+    if (code === -2) {
+      MessageBox.confirm('token已失效，是否重新登录', '确认注销', {
+        confirmButtonText: '重新登录',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        store.dispatch('user/resetToken').then(() => {
+          location.reload()
+        })
+      })
+    } else {
+      Message({
+        message: msg || '连接错误',
+        type: 'success',
+        duration: 5 * 1000
+      })
+    }
     return Promise.reject(error)
   }
 )

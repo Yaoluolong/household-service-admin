@@ -1,0 +1,94 @@
+<template>
+  <div class="app-container">
+    <el-table :data="tableData" style="width: 100%" border>
+      <el-table-column label="员工编号" align="center" width="100">
+        <template slot-scope="scope">{{ scope.row.staffID }}</template>
+      </el-table-column>
+      <el-table-column label="姓名" align="center" width="180">
+        <template slot-scope="scope">{{ scope.row.name }}</template>
+      </el-table-column>
+      <el-table-column label="性别" align="center" width="100">
+        <template slot-scope="scope">{{ scope.row.sex }}</template>
+      </el-table-column>
+      <el-table-column label="年龄" align="center" width="100">
+        <template slot-scope="scope">{{ scope.row.age }}</template>
+      </el-table-column>
+      <el-table-column label="职业" align="center" width="180">
+        <template slot-scope="scope">{{ scope.row.vocation }}</template>
+      </el-table-column>
+      <el-table-column label="入职日期" align="center" width="180">
+        <template slot-scope="scope">{{ scope.row.entryDate }}</template>
+      </el-table-column>
+      <el-table-column label="简介" align="center" width="400">
+        <template slot-scope="scope">{{ scope.row.profile }}</template>
+      </el-table-column>
+      <el-table-column label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <details-dialog
+      :dialog-visible="dialogVisible"
+      :item="item"
+      :title="'员工信息详情'"
+      @closeDialog="_=>dialogVisible=false"
+    />
+  </div>
+</template>
+
+<script>
+import { list } from '@/api/staff'
+import { check } from '@/utils/check-data'
+import DetailsDialog from './components/DetailDialog'
+
+export default {
+  components: {
+    DetailsDialog
+  },
+  data() {
+    return {
+      item: [],
+      dialogVisible: false,
+      tableData: [
+        {
+          name: '王小虎',
+          staffID: '001',
+          vocation: '护士',
+          sex: '女',
+          age: '18',
+          profile: '大萨达',
+          entryDate: '2019-01-01',
+          picture: ''
+        }
+      ]
+    }
+  },
+  mounted() {
+    this.fetchData()
+  },
+  methods: {
+    fetchData() {
+      list()
+        .then(result => {
+          this.tableData = check(result.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    handleDetail(index, row) {
+      console.log(index, row)
+      this.item = [{ label: '照片', value: row.picture },
+        { label: '姓名', value: row.name },
+        { label: '员工编号', value: row.staffID },
+        { label: '性别', value: row.sex },
+        { label: '年龄', value: row.age },
+        { label: '职业', value: row.vocation },
+        { label: '入职日期', value: row.entryDate },
+        { label: '简介', value: row.profile }]
+      this.dialogVisible = true
+    }
+  }
+}
+</script>
