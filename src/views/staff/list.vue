@@ -19,7 +19,7 @@
       <el-table-column label="入职日期" align="center" width="180">
         <template slot-scope="scope">{{ scope.row.entryDate }}</template>
       </el-table-column>
-      <el-table-column label="简介" align="center" width="400">
+      <el-table-column label="简介" align="center" width="450">
         <template slot-scope="scope">{{ scope.row.profile }}</template>
       </el-table-column>
       <el-table-column label="操作" align="center">
@@ -32,8 +32,12 @@
       :dialog-visible="dialogVisible"
       :item="item"
       :title="'员工信息详情'"
-      @closeDialog="_=>dialogVisible=false"
-    />
+      @close="_=>dialogVisible=false"
+      @closed="_=>isEdit=false"
+      @on-edit="_=>isEdit=true"
+    >
+      <edit-staff v-if="isEdit" :item="uneditData" />
+    </detail-dialog>
   </div>
 </template>
 
@@ -41,27 +45,20 @@
 import { list } from '@/api/staff'
 import { check } from '@/utils/check-data'
 import DetailDialog from '@/components/DetailDialog'
+import EditStaff from './components/EditStaff'
 
 export default {
   components: {
-    DetailDialog
+    DetailDialog,
+    EditStaff
   },
   data() {
     return {
+      isEdit: false,
       item: [],
+      uneditData: {},
       dialogVisible: false,
-      tableData: [
-        {
-          name: '王小虎',
-          staffID: '001',
-          vocation: '护士',
-          sex: '女',
-          age: '18',
-          profile: '大萨达',
-          entryDate: '2019-01-01',
-          picture: ''
-        }
-      ]
+      tableData: []
     }
   },
   mounted() {
@@ -78,16 +75,17 @@ export default {
         })
     },
     handleDetail(index, row) {
-      console.log(index, row)
-      this.item = [{ label: '照片', value: row.picture },
-        { label: '姓名', value: row.name },
+      this.item = [
+        { model: 'upload-image', label: '照片', type: 'image', value: row.picture },
+        { model: 'input', label: '姓名', value: row.name },
         { label: '员工编号', value: row.staffID },
-        { label: '性别', value: row.sex },
-        { label: '年龄', value: row.age },
-        { label: '职业', value: row.vocation },
-        { label: '入职日期', value: row.entryDate },
-        { label: '简介', value: row.profile }]
+        { model: 'input', label: '性别', value: row.sex },
+        { model: 'input-number', label: '年龄', value: row.age },
+        { model: 'input', label: '职业', value: row.vocation },
+        { model: 'date-picker', label: '入职日期', value: row.entryDate },
+        { model: 'input-textarea', label: '简介', value: row.profile }]
       this.dialogVisible = true
+      this.uneditData = row
     }
   }
 }

@@ -1,12 +1,13 @@
 <template>
   <div class="app-container">
     <h2>员工新增</h2>
+    <el-divider />
     <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
       <el-form-item label="照片" prop="picture">
-        <upload-avatar ref="upload" @exist="val=>ruleForm.picture=val" @success="val=>test(val)" />
+        <upload-avatar ref="upload" @exist="val=>ruleForm.picture=val" @success="val=>handleSubmit(val)" />
       </el-form-item>
       <el-form-item label="姓名" prop="name">
-        <el-input v-model="ruleForm.name" />
+        <el-input v-model="ruleForm.name" placeholder="请输入姓名" />
       </el-form-item>
       <el-form-item label="性别" prop="sex" style="5px">
         <el-select v-model="ruleForm.sex" placeholder="请选择性别">
@@ -18,7 +19,7 @@
         <el-input-number v-model="ruleForm.age" :min="18" :max="60" label="年龄" />
       </el-form-item>
       <el-form-item label="职业" prop="vocation">
-        <el-input v-model="ruleForm.vocation" />
+        <el-input v-model="ruleForm.vocation" placeholder="请输入职业" />
       </el-form-item>
       <el-form-item label="入职日期" required>
         <el-date-picker
@@ -30,7 +31,7 @@
         />
       </el-form-item>
       <el-form-item label="简介" prop="profile">
-        <el-input v-model="ruleForm.profile" type="textarea" />
+        <el-input v-model="ruleForm.profile" type="textarea" maxlength="30" placeholder="请输入简介" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('ruleForm')">新增</el-button>
@@ -90,9 +91,8 @@ export default {
     }
   },
   methods: {
-    test(val) {
+    handleSubmit(val) {
       const filename = val
-      console.log(filename)
       if (filename !== '') {
         return new Promise((resolve, reject) => {
           create(this.ruleForm, filename).then(response => {
@@ -124,6 +124,15 @@ export default {
       })
     },
     resetForm(formName) {
+      this.ruleForm = {
+        picture: false,
+        name: '',
+        sex: '',
+        age: 18,
+        vocation: '',
+        entryDate: '',
+        profile: ''
+      }
       this.$refs[formName].resetFields()
       this.$refs.upload.handleRemove()
     }

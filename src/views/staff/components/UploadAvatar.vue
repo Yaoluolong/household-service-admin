@@ -22,10 +22,11 @@ import { getToken } from '@/utils/auth'
 export default {
   name: 'UploadAvatar',
   props: {
+    url: { type: String, required: false, default: '' }
   },
   data() {
     return {
-      imageUrl: '',
+      imageUrl: this.url,
       action: `${process.env.VUE_APP_BASE_API}/upload/avatar`
     }
   },
@@ -54,7 +55,7 @@ export default {
           fileList.splice(0, 1)
         }
         this.imageUrl = URL.createObjectURL(file.raw)
-        this.$emit('exist', true)
+        this.$emit('exist', true, this.imageUrl)
       }
     },
     handleRemove() {
@@ -63,8 +64,11 @@ export default {
       this.$emit('exist', false)
     },
     handleAvatarSuccess(res, file) {
-      console.log('success')
-      this.$emit('success', file.name)
+      this.$emit('success', res.data)
+    },
+    handleReset() {
+      this.$refs.upload.clearFiles()
+      this.imageUrl = this.url
     }
   }
 }
