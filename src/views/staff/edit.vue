@@ -1,13 +1,15 @@
 <template>
   <div>
-    员工编辑
+    <single-image-upload3 />
   </div>
 </template>
 
 <script>
+import SingleImageUpload3 from '@/components/Upload/SingleImage3'
+
 export default {
   name: '',
-  components: {},
+  components: { SingleImageUpload3 },
   data() {
     return {}
   },

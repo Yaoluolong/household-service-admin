@@ -12,7 +12,6 @@ service.interceptors.request.use(
   config => {
     if (store.getters.token) {
       config.headers['Authorization'] = `Bearer ${getToken()}`
-      console.log(config)
     }
     return config
   },

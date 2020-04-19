@@ -1,10 +1,13 @@
 import request from '@/utils/request'
 
-export function create(data) {
+export function create(data, filename) {
   return request({
     url: '/staff/create',
     method: 'post',
-    data
+    data: {
+      ...data,
+      filename
+    }
   })
 }
 

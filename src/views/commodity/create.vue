@@ -1,13 +1,21 @@
 <template>
-  <div id="root">商品新增</div>
+  <div>
+    <single-image-upload />
+  </div>
 </template>
 
 <script>
-export default {
+import SingleImageUpload from '@/components/Upload/SingleImage'
 
+export default {
+  name: '',
+  components: { SingleImageUpload },
+  data() {
+    return {}
+  },
+  methods: {}
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
 </style>

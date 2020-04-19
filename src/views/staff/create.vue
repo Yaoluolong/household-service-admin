@@ -2,6 +2,9 @@
   <div class="app-container">
     <h2>员工新增</h2>
     <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
+      <el-form-item label="照片" prop="picture">
+        <upload-avatar ref="upload" @exist="val=>ruleForm.picture=val" @success="val=>test(val)" />
+      </el-form-item>
       <el-form-item label="姓名" prop="name">
         <el-input v-model="ruleForm.name" />
       </el-form-item>
@@ -39,16 +42,28 @@
 
 <script>
 import { create } from '@/api/staff'
+import UploadAvatar from './components/UploadAvatar'
 
 export default {
+  name: 'StaffCreate',
+  components: { UploadAvatar },
   data() {
+    var checkPicture = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请上传照片'))
+      } else {
+        callback()
+      }
+    }
     return {
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
         }
       },
+      filename: '',
       ruleForm: {
+        picture: false,
         name: '陈雁鸣',
         sex: '女',
         age: 20,
@@ -57,6 +72,7 @@ export default {
         profile: '大美女'
       },
       rules: {
+        picture: [{ validator: checkPicture, required: true, trigger: 'change' }],
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
           { min: 2, max: 4, message: '长度在 2 到 4 个字符', trigger: 'blur' }
@@ -74,19 +90,31 @@ export default {
     }
   },
   methods: {
+    test(val) {
+      const filename = val
+      console.log(filename)
+      if (filename !== '') {
+        return new Promise((resolve, reject) => {
+          create(this.ruleForm, filename).then(response => {
+            this.$message({
+              message: '新增成功',
+              type: 'success'
+            })
+          }).catch(err => {
+            reject(err)
+          })
+        })
+      } else {
+        this.$message({
+          message: '图片上传失败',
+          type: 'error'
+        })
+      }
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          return new Promise((resolve, reject) => {
-            create(this.ruleForm).then(response => {
-              this.$message({
-                message: '新增成功',
-                type: 'success'
-              })
-            }).catch(err => {
-              reject(err)
-            })
-          })
+          this.$refs.upload.$refs.upload.submit()
         } else {
           this.$message({
             message: '请输入正确的信息',
@@ -97,6 +125,7 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+      this.$refs.upload.handleRemove()
     }
   }
 }

@@ -4,7 +4,7 @@
       <el-table-column label="员工编号" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.staffID }}</template>
       </el-table-column>
-      <el-table-column label="姓名" align="center" width="180">
+      <el-table-column label="姓名" align="center" width="120">
         <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
       <el-table-column label="性别" align="center" width="100">
@@ -28,7 +28,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <details-dialog
+    <detail-dialog
       :dialog-visible="dialogVisible"
       :item="item"
       :title="'员工信息详情'"
@@ -40,11 +40,11 @@
 <script>
 import { list } from '@/api/staff'
 import { check } from '@/utils/check-data'
-import DetailsDialog from './components/DetailDialog'
+import DetailDialog from '@/components/DetailDialog'
 
 export default {
   components: {
-    DetailsDialog
+    DetailDialog
   },
   data() {
     return {
