@@ -16,15 +16,19 @@
           <span v-if="!obj.type" class="detail__value">{{ obj.value }}</span>
           <el-image
             v-if="obj.type==='image'"
-            style="width: 178px; height: 178px;vertical-align:top"
+            style="width: 140px; height: 170px;vertical-align:top"
             :src="obj.value"
+            fit="cover"
           />
         </div>
       </div>
     </slot>
-    <div slot="footer" class="dialog-footer">
-      <el-button type="success" @click="$emit('on-edit')">编辑</el-button>
-      <el-button type="primary" @click="handleClose()">确 定</el-button>
+    <div v-if="isEdit" slot="footer" class="dialog-footer">
+      <el-button type="info" @click="isEdit=false;$emit('cancel')">取 消</el-button>
+    </div>
+    <div v-else slot="footer" class="dialog-footer">
+      <el-button type="danger" @click="handleRemove()">移 除</el-button>
+      <el-button type="success" @click="$emit('on-edit');isEdit=true">编 辑</el-button>
     </div>
   </el-dialog>
 </template>
@@ -39,6 +43,7 @@ export default {
   },
   data() {
     return {
+      isEdit: false,
       visible: this.dialogVisible
     }
   },
@@ -48,6 +53,20 @@ export default {
     }
   },
   methods: {
+    handleRemove() {
+      this.$confirm('确认移除该员工?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$emit('on-remove', this.item)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
     handleEdit(index, row) {
       console.log(index, row)
     },
@@ -56,6 +75,7 @@ export default {
     },
     handleClose() {
       this.$emit('close')
+      this.isEdit = false
     }
   }
 }

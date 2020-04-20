@@ -1,5 +1,8 @@
 <template>
   <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
+    <el-form-item label="员工编号" prop="staffID">
+      {{ ruleForm.staffID }}
+    </el-form-item>
     <el-form-item label="照片" prop="image">
       <upload-avatar
         ref="upload"
@@ -23,7 +26,7 @@
     <el-form-item label="职业" prop="vocation">
       <el-input v-model="ruleForm.vocation" placeholder="请输入职业" />
     </el-form-item>
-    <el-form-item label="入职日期" required>
+    <el-form-item label="入职日期" prop="entryDate">
       <el-date-picker
         v-model="ruleForm.entryDate"
         type="date"
@@ -36,14 +39,14 @@
       <el-input v-model="ruleForm.profile" type="textarea" maxlength="30" placeholder="请输入简介" />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')">新增</el-button>
+      <el-button type="primary" @click="submitForm('ruleForm')">确认</el-button>
       <el-button @click="resetForm('ruleForm')">重置</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script>
-import { create } from '@/api/staff'
+import { update } from '@/api/staff'
 import UploadAvatar from './UploadAvatar'
 
 export default {
@@ -66,6 +69,7 @@ export default {
           return time.getTime() > Date.now()
         }
       },
+      oriUrl: this.item.picture,
       filename: '',
       ruleForm: { ...this.item, image: true },
       rules: {
@@ -89,35 +93,47 @@ export default {
   methods: {
     handleSubmit(val) {
       const filename = val
+      console.log(val + 'handleSubmit')
       if (filename !== '') {
-        return new Promise((resolve, reject) => {
-          create(this.ruleForm, filename).then(response => {
-            this.$message({
-              message: '编辑成功',
-              type: 'success'
-            })
-          }).catch(err => {
-            reject(err)
+        update(this.ruleForm, filename, this.oriUrl).then(response => {
+          this.$message({
+            message: '编辑成功',
+            type: 'success'
           })
-        })
-      } else {
-        this.$message({
-          message: '图片上传失败',
-          type: 'error'
+          this.$emit('on-success')
+        }).catch(err => {
+          this.$message({
+            message: err || '编辑失败',
+            type: 'error'
+          })
         })
       }
     },
     submitForm(formName) {
       const isNotChange = JSON.stringify(this.ruleForm) === JSON.stringify({ ...this.item, image: true })
       this.$refs[formName].validate((valid) => {
-        console.log(isNotChange)
         if (valid) {
           if (isNotChange) {
             this.$message({
               message: '你没有做出任何改动！',
               type: 'warning'
             })
-          } else { this.$refs.upload.$refs.upload.submit() }
+          } else {
+            if (this.ruleForm.picture === this.item.picture) {
+              update(this.ruleForm).then(response => {
+                this.$message({
+                  message: '编辑成功',
+                  type: 'success'
+                })
+                this.$emit('on-success')
+              }).catch(err => {
+                this.$message({
+                  message: err || '编辑失败',
+                  type: 'error'
+                })
+              })
+            } else { this.$refs.upload.$refs.upload.submit() }
+          }
         } else {
           this.$message({
             message: '请输入正确的信息',

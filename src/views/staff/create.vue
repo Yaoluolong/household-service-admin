@@ -21,7 +21,7 @@
       <el-form-item label="职业" prop="vocation">
         <el-input v-model="ruleForm.vocation" placeholder="请输入职业" />
       </el-form-item>
-      <el-form-item label="入职日期" required>
+      <el-form-item label="入职日期">
         <el-date-picker
           v-model="ruleForm.entryDate"
           type="date"
@@ -69,7 +69,7 @@ export default {
         sex: '女',
         age: 20,
         vocation: '看护',
-        entryDate: '2019-01-01',
+        entryDate: '',
         profile: '大美女'
       },
       rules: {

@@ -16,13 +16,11 @@ service.interceptors.request.use(
     return config
   },
   error => {
-    console.log(error)
     return Promise.reject(error)
   }
 )
 
 service.interceptors.response.use(
-
   response => {
     const res = response.data
     if (res.code !== 0) {
@@ -49,6 +47,7 @@ service.interceptors.response.use(
     }
   },
   error => {
+    console.log({ error })
     const { msg, code } = error.response.data
     if (code === -2) {
       MessageBox.confirm('token已失效，是否重新登录', '确认注销', {
@@ -63,11 +62,11 @@ service.interceptors.response.use(
     } else {
       Message({
         message: msg || '连接错误',
-        type: 'success',
+        type: 'error',
         duration: 5 * 1000
       })
     }
-    return Promise.reject(error)
+    return Promise.reject()
   }
 )
 

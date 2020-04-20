@@ -11,13 +11,25 @@ export function create(data, filename) {
   })
 }
 
-export function update(data, filename) {
+export function update(data, filename, ori) {
   return request({
-    url: '/staff/create',
+    url: '/staff/update',
     method: 'post',
     data: {
       ...data,
-      filename
+      filename,
+      ori
+    }
+  })
+}
+
+export function remove(id, url) {
+  return request({
+    url: '/staff/remove',
+    method: 'post',
+    data: {
+      id,
+      url
     }
   })
 }
