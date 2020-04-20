@@ -21,7 +21,7 @@
       <el-form-item label="职业" prop="vocation">
         <el-input v-model="ruleForm.vocation" placeholder="请输入职业" />
       </el-form-item>
-      <el-form-item label="入职日期">
+      <el-form-item label="入职日期" prop="entryDate">
         <el-date-picker
           v-model="ruleForm.entryDate"
           type="date"
@@ -82,7 +82,7 @@ export default {
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
         entryDate: [
-          { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+          { required: true, message: '请选择日期', trigger: 'change' }
         ],
         vocation: [
           { required: true, message: '请输入职业', trigger: 'blur' }
@@ -99,6 +99,18 @@ export default {
             this.$message({
               message: '新增成功',
               type: 'success'
+            })
+            this.$nextTick(_ => {
+              this.ruleForm = {
+                picture: false,
+                name: '',
+                sex: '',
+                age: 18,
+                vocation: '',
+                entryDate: '',
+                profile: ''
+              }
+              this.$refs.ruleForm.resetFields()
             })
           }).catch(err => {
             reject(err)

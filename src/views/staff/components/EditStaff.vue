@@ -82,7 +82,7 @@ export default {
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
         entryDate: [
-          { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+          { required: true, message: '请选择日期', trigger: 'change' }
         ],
         vocation: [
           { required: true, message: '请输入职业', trigger: 'blur' }
@@ -93,7 +93,6 @@ export default {
   methods: {
     handleSubmit(val) {
       const filename = val
-      console.log(val + 'handleSubmit')
       if (filename !== '') {
         update(this.ruleForm, filename, this.oriUrl).then(response => {
           this.$message({
