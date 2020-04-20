@@ -1,15 +1,18 @@
 <template>
-  <div>
-    <single-image-upload />
+  <div class="app-container">
+    <h2>商品新增</h2>
+    <el-divider />
+    <create-or-edit />
   </div>
 </template>
 
 <script>
-import SingleImageUpload from '@/components/Upload/SingleImage'
+import CreateOrEdit from './components/CreateOrEdit'
 
 export default {
-  name: '',
-  components: { SingleImageUpload },
+
+  name: 'Create',
+  components: { CreateOrEdit },
   data() {
     return {}
   },

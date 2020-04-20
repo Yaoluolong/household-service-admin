@@ -20,7 +20,7 @@
         <el-option label="女" value="女" />
       </el-select>
     </el-form-item>
-    <el-form-item label="年龄" prop="age">
+    <el-form-item label="年龄" prop="age" required>
       <el-input-number v-model="ruleForm.age" :min="18" :max="60" label="年龄" />
     </el-form-item>
     <el-form-item label="职业" prop="vocation">
