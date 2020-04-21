@@ -1,7 +1,13 @@
 <template>
   <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px">
-    <el-form-item label="商品图片" prop="picture">
-      <upload-picture />
+    <el-form-item label="商品图片" prop="show">
+      <upload-picture
+        ref="upload"
+        :url="'/upload/show'"
+        @add="obj=>ruleForm.show.push(obj.name)"
+        @remove="arr=>ruleForm.show=arr"
+        @success="arr=>handleSubmit(arr)"
+      />
     </el-form-item>
     <el-form-item label="商品名称" prop="name">
       <el-input v-model="ruleForm.name" />
@@ -10,13 +16,37 @@
       <el-input v-model="ruleForm.price" />
     </el-form-item>
     <el-form-item label="所属分类" prop="class">
-      <select-item />
+      <el-select v-model="ruleForm.class" filterable placeholder="请选择">
+        <el-option
+          v-for="(item,index) in classes"
+          :key="index"
+          :label="item.value"
+          :value="item.value"
+        />
+      </el-select>
     </el-form-item>
     <el-form-item label="可选员工" prop="staff">
-      <select-item />
+      <el-select
+        v-model="ruleForm.staff"
+        multiple
+        collapse-tags
+        filterable
+        placeholder="请选择"
+      >
+        <el-option
+          v-for="staff in staffs"
+          :key="staff.value"
+          :label="staff.label"
+          :value="staff.value"
+        >
+          <span style="float: right; color: #8492a6; font-size: 13px">{{ staff.value }}</span>
+          <span style="float: left;font-weight:600">{{ staff.label }}</span>
+          <span style="float: right;margin-right:35px">{{ staff.vocation }}</span>
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="商品描述" prop="describe">
-      <el-input v-model="ruleForm.describe" type="textarea" />
+      <el-input v-model="ruleForm.describe" type="textarea" placeholder="请输入商品描述" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
@@ -27,52 +57,90 @@
 
 <script>
 import UploadPicture from './UploadPicture'
-import SelectItem from './SelectItem'
+import { queryClass } from '@/api/class'
+import { list } from '@/api/staff'
+import { create } from '@/api/commodity'
 
 export default {
   name: 'CreateOrEdit',
-  components: { UploadPicture, SelectItem },
+  components: { UploadPicture },
   data() {
     return {
+      classes: [],
+      staffs: [],
       ruleForm: {
-        picture: '',
-        name: '',
-        price: '',
+        show: [],
+        name: '月嫂',
+        price: 100,
         class: '',
         staff: [],
-        describe: ''
+        describe: '坐月子'
       },
       rules: {
+        show: [
+          { required: true, message: '请选择商品展示图', trigger: 'blur' }
+        ],
         name: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { required: true, message: '请输入商品名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
         ],
-        region: [
-          { required: true, message: '请选择活动区域', trigger: 'change' }
+        price: [
+          { type: 'number', required: true, message: '请输入商品价格', trigger: 'blur' }
         ],
-        date1: [
-          { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+        class: [
+          { required: true, message: '请选择商品的分类', trigger: 'blur' }
         ],
-        date2: [
-          { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
-        ],
-        type: [
-          { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
-        ],
-        resource: [
-          { required: true, message: '请选择活动资源', trigger: 'change' }
+        staff: [
+          { required: true, message: '请选择商品的可选员工', trigger: 'blur' }
         ],
         describe: [
-          { required: true, message: '请填写活动形式', trigger: 'blur' }
+          { required: true, message: '请填写商品描述', trigger: 'blur' }
         ]
       }
     }
   },
+  mounted() {
+    this.fetchData()
+  },
   methods: {
+    handleSubmit(files) {
+      this.ruleForm.show = files.map(val => process.env.VUE_APP_BASE_SRC + '/show/' + val)
+      create(this.ruleForm).then(response => {
+        this.$message({
+          message: '新增成功',
+          type: 'success'
+        })
+        this.$nextTick(() => {
+          this.resetForm('ruleForm')
+        })
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    fetchData() {
+      queryClass().then(response => {
+        this.classes = response.data.map(obj => {
+          const value = obj.class
+          return { value }
+        })
+      }).catch(err => {
+        console.log(err)
+      })
+      list().then(response => {
+        this.staffs = response.data.map(obj => {
+          const label = obj.name
+          const value = obj.staffID
+          const vocation = obj.vocation
+          return { label, value, vocation }
+        })
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
+          this.$refs.upload.$refs.upload.submit()
         } else {
           console.log('error submit!!')
           return false
