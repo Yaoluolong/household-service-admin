@@ -10,7 +10,6 @@
       :headers="headers"
       :on-change="handleChange"
       :limit="4"
-      :file-list="fileList"
       :on-exceed="handleExceed"
       :on-success="handleSuccess"
     >
@@ -34,11 +33,10 @@ export default {
   },
   data() {
     return {
-      fileList: this.value,
+      uploaded: this.value,
       action: process.env.VUE_APP_BASE_API + this.url,
       dialogImageUrl: '',
-      dialogVisible: false,
-      uploaded: []
+      dialogVisible: false
     }
   },
   computed: {
@@ -55,7 +53,6 @@ export default {
     handleChange(file, fileList) {
       const isJPG = file.raw.type === 'image/jpeg' || file.raw.type === 'image/png'
       const isLt5M = file.raw.size / 1024 / 1024 < 5
-
       if (!isJPG) {
         this.$message.error('上传图片只能是 JPG 或者 PNG 格式!')
       }
@@ -63,14 +60,12 @@ export default {
         this.$message.error('上传图片大小不能超过 5MB!')
       }
       if (isJPG && isLt5M && fileList.length <= 4) {
-        this.$message.success('上传成功')
         this.$emit('add', file)
       } else {
         fileList.pop()
       }
     },
     handleRemove(file, fileList) {
-      console.log(fileList)
       const filename = fileList.map(obj => obj.name)
       this.$emit('remove', filename)
     },
@@ -82,6 +77,10 @@ export default {
       this.uploaded.push(response.data)
       if (this.uploaded.length === fileList.length) {
         this.$emit('success', this.uploaded)
+        this.$nextTick(() => {
+          this.uploaded = []
+          this.$refs.upload.clearFiles()
+        })
       }
     }
   }

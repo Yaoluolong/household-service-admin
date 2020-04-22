@@ -1,11 +1,11 @@
 <template>
   <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px">
-    <el-form-item label="商品图片" prop="show">
+    <el-form-item label="商品图片" prop="isAdded">
       <upload-picture
         ref="upload"
         :url="'/upload/show'"
-        @add="obj=>ruleForm.show.push(obj.name)"
-        @remove="arr=>ruleForm.show=arr"
+        @add="obj=>ruleForm.isAdded.push(obj.name)"
+        @remove="arr=>ruleForm.isAdded=arr"
         @success="arr=>handleSubmit(arr)"
       />
     </el-form-item>
@@ -13,7 +13,7 @@
       <el-input v-model="ruleForm.name" />
     </el-form-item>
     <el-form-item label="商品价格" prop="price">
-      <el-input v-model="ruleForm.price" />
+      <el-input-number v-model="ruleForm.price" />
     </el-form-item>
     <el-form-item label="所属分类" prop="class">
       <el-select v-model="ruleForm.class" filterable placeholder="请选择">
@@ -70,14 +70,15 @@ export default {
       staffs: [],
       ruleForm: {
         show: [],
-        name: '月嫂',
-        price: 100,
+        isAdded: [],
+        name: '',
+        price: 0,
         class: '',
         staff: [],
-        describe: '坐月子'
+        describe: ''
       },
       rules: {
-        show: [
+        isAdded: [
           { required: true, message: '请选择商品展示图', trigger: 'blur' }
         ],
         name: [
@@ -105,13 +106,14 @@ export default {
   methods: {
     handleSubmit(files) {
       this.ruleForm.show = files.map(val => process.env.VUE_APP_BASE_SRC + '/show/' + val)
+      console.log(this.ruleForm.show)
       create(this.ruleForm).then(response => {
         this.$message({
           message: '新增成功',
           type: 'success'
         })
         this.$nextTick(() => {
-          this.resetForm('ruleForm')
+          this.$refs['ruleForm'].resetFields()
         })
       }).catch(err => {
         console.log(err)
