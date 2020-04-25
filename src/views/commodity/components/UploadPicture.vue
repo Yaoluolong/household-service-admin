@@ -12,6 +12,8 @@
       :limit="4"
       :on-exceed="handleExceed"
       :on-success="handleSuccess"
+      :on-error="handleError"
+      :file-list="list"
     >
       <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过5mb</div>
       <i class="el-icon-plus" />
@@ -29,7 +31,8 @@ export default {
   name: 'UploadPicture',
   props: {
     value: { type: Array, required: false, default: () => [] },
-    url: { type: String, required: false, default: '' }
+    url: { type: String, required: false, default: '' },
+    list: { type: Array, required: false, default: () => [] }
   },
   data() {
     return {
@@ -44,6 +47,11 @@ export default {
       return {
         Authorization: `Bearer ${getToken()}`
       }
+    }
+  },
+  created() {
+    if (this.list.length !== 0) {
+      this.uploaded = this.list.map(obj => obj.url)
     }
   },
   methods: {
@@ -65,9 +73,12 @@ export default {
         fileList.pop()
       }
     },
+    handleError(err, file, fileList) {
+      console.log(err)
+    },
     handleRemove(file, fileList) {
       const filename = fileList.map(obj => obj.name)
-      this.$emit('remove', filename)
+      this.$emit('remove', filename, file)
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url
@@ -75,7 +86,9 @@ export default {
     },
     handleSuccess(response, file, fileList) {
       this.uploaded.push(response.data)
-      if (this.uploaded.length === fileList.length) {
+      if (this.$refs.upload.uploadFiles.every(obj => {
+        return obj.status === 'success'
+      })) {
         this.$emit('success', this.uploaded)
         this.$nextTick(() => {
           this.uploaded = []

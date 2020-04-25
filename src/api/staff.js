@@ -40,3 +40,13 @@ export function list() {
     method: 'get'
   })
 }
+
+export function query(id) {
+  return request({
+    url: '/staff/query',
+    method: 'post',
+    data: {
+      id
+    }
+  })
+}

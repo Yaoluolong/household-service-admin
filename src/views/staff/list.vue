@@ -79,7 +79,7 @@ export default {
     },
     handleDetail(index, row) {
       this.item = [
-        { label: '照片', type: 'image', value: row.picture },
+        { label: '照片', type: 'image', value: [row.picture] },
         { label: '姓名', value: row.name },
         { label: '员工编号', value: row.staffID },
         { label: '性别', value: row.sex },

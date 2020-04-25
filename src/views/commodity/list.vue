@@ -1,92 +1,67 @@
 <template>
   <div class="app-container">
-    <el-upload
-      class="avatar-uploader"
-      :action="action"
-      :show-file-list="false"
-      :on-success="handleAvatarSuccess"
-      :on-error="handleAvavtarFail"
-      :before-upload="beforeAvatarUpload"
-      :limit="1"
-      :multiple="false"
-      :headers="headers"
-    >
-      <div class="el-upload">
-        <img v-if="imageUrl" :src="imageUrl" class="avatar">
-        <i v-else class="el-icon-plus avatar-uploader-icon" />
-      </div>
-    </el-upload>
+    <el-collapse v-model="activeNames" @change="handleChange">
+      <el-collapse-item v-for="(item,index) in classes" :key="index" :title="item.label" :name="index">
+        <item-card :cards="item.values" @on-remove="update" @on-edit="update" />
+      </el-collapse-item>
+    </el-collapse>
   </div>
 </template>
 
 <script>
-import { getToken } from '@/utils/auth'
+import { queryClass } from '@/api/class'
+import { list } from '@/api/commodity'
+import ItemCard from './components/ItemCard'
 
 export default {
+  name: 'List',
+  components: { ItemCard },
   data() {
     return {
-      imageUrl: '',
-      action: `${process.env.VUE_APP_BASE_API}/upload/avatar`
+      activeNames: ['1'],
+      classes: []
     }
   },
-  computed: {
-    headers() {
-      return {
-        Authorization: `Bearer ${getToken()}`
-      }
-    }
+  mounted() {
+    this.fetchData()
   },
   methods: {
-    handleAvavtarFail(err) {
-      const errMsg = (err.message && JSON.parse(err.message)) || '上传失败'
-      this.$message({
-        message: (errMsg.msg && `上传失败，失败原因：${errMsg.msg}`) || '上传失败',
-        type: 'error'
+    update() {
+      this.$nextTick(_ => {
+        this.fetchData()
       })
-      this.$emit('onError', err)
     },
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
+    fetchData() {
+      queryClass().then(response => {
+        this.classes = response.data.map(obj => {
+          return { label: obj.className, values: [] }
+        })
+        list().then(response => {
+          this.classes.forEach(i => {
+            if (Array.isArray(response.data)) {
+              i.values = response.data.filter(j => {
+                return j.className === i.label
+              })
+            } else {
+              i.values = [response.data].filter(j => {
+                return j.className === i.label
+              })
+            }
+          })
+        }).catch(err => {
+          console.log(err)
+        })
+      }).catch(err => {
+        console.log(err)
+      })
     },
-    beforeAvatarUpload(file) {
-      console.log(file)
-      const isJPG = file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
-      }
-      return isJPG && isLt2M
+    handleChange(val) {
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.el-upload:hover {
-  border-color: #409eff !important;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
-  text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
+<style>
+
 </style>
+

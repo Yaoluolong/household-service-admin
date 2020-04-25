@@ -4,13 +4,17 @@
       <upload-picture
         ref="upload"
         :url="'/upload/show'"
-        @add="obj=>ruleForm.isAdded.push(obj.name)"
-        @remove="arr=>ruleForm.isAdded=arr"
-        @success="arr=>handleSubmit(arr)"
+        :list="oriShow"
+        @add="handleAdd"
+        @remove="(fileList,file)=>removeShow(file,fileList)"
+        @success="judgeStatus"
       />
     </el-form-item>
     <el-form-item label="商品名称" prop="name">
       <el-input v-model="ruleForm.name" />
+    </el-form-item>
+    <el-form-item v-if="ruleForm.commodityID!==''" label="商品编号">
+      {{ ruleForm.commodityID }}
     </el-form-item>
     <el-form-item label="商品价格" prop="price">
       <el-input-number v-model="ruleForm.price" />
@@ -49,7 +53,8 @@
       <el-input v-model="ruleForm.describe" type="textarea" placeholder="请输入商品描述" />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+      <el-button v-if="isEdit" type="primary" @click="submitEdit('ruleForm')">确认</el-button>
+      <el-button v-else type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
       <el-button @click="resetForm('ruleForm')">重置</el-button>
     </el-form-item>
   </el-form>
@@ -59,18 +64,26 @@
 import UploadPicture from './UploadPicture'
 import { queryClass } from '@/api/class'
 import { list } from '@/api/staff'
-import { create } from '@/api/commodity'
+import { create, update } from '@/api/commodity'
 
 export default {
   name: 'CreateOrEdit',
   components: { UploadPicture },
+  props: {
+    ori: { type: Object, required: false, default: () => { return { show: [] } } },
+    edit: { type: Boolean, required: false, default: () => false }
+  },
   data() {
     return {
+      isEdit: this.edit,
+      oriShow: [],
       classes: [],
       staffs: [],
       ruleForm: {
+        commodityID: '',
         show: [],
-        isAdded: [],
+        isRemoved: [],
+        isAdded: [...this.ori.show],
         name: '',
         price: 0,
         class: '',
@@ -100,13 +113,102 @@ export default {
       }
     }
   },
+  created() {
+    if (this.ori.show.length !== 0) {
+      this.ruleForm.name = this.ori.name
+      this.ruleForm.commodityID = this.ori.commodityID
+      this.ruleForm.describe = this.ori.describe
+      this.ruleForm.price = this.ori.price
+      this.ruleForm.class = this.ori.className
+      this.ruleForm.staff = this.ori.staffID
+      this.ruleForm.show = this.ori.show
+      this.oriShow = this.ori.show.map(val => { return { url: val, name: val } })
+    }
+  },
   mounted() {
     this.fetchData()
   },
   methods: {
+    judgeStatus(arr) {
+      if (this.isEdit) {
+        this.handleEdit(arr)
+      } else {
+        this.handleSubmit(arr)
+      }
+    },
+    handleAdd(obj) {
+      this.ruleForm.isAdded.push(obj.name)
+    },
+    removeShow(file, fileList) {
+      this.ruleForm.isAdded = fileList
+      if (file.status === 'success') {
+        this.ruleForm.isRemoved.push(file.name.split('/').pop())
+        if (this.ruleForm.show.indexOf(file.name) !== -1) {
+          this.ruleForm.show.splice(this.ruleForm.show.indexOf(file.name), 1)
+        }
+      }
+    },
+    handleEdit(files) {
+      files.forEach(val => {
+        if (val.split(':')[0] !== 'https') {
+          this.ruleForm.show.push(process.env.VUE_APP_BASE_SRC + '/show/' + val)
+        }
+      })
+      update(this.ruleForm).then(result => {
+        this.$emit('on-success')
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    submitEdit(formName) {
+      let isNotChange = false
+      if (this.ori) {
+        if (
+          this.ruleForm.name === this.ori.name &&
+          this.ruleForm.describe === this.ori.describe &&
+          this.ruleForm.price === this.ori.price &&
+          this.ruleForm.class === this.ori.className &&
+          this.ruleForm.staff === this.ori.staffID &&
+          this.ruleForm.isAdded === this.ori.show
+        ) {
+          isNotChange = true
+        }
+      }
+
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (isNotChange) {
+            this.$message({
+              message: '你没有做出任何改动！',
+              type: 'warning'
+            })
+          } else {
+            update(this.ruleForm).then(result => {
+              this.$message({
+                message: '编辑成功',
+                type: 'success'
+              })
+              this.isRemoved = []
+            }).catch(err => {
+              console.log(err)
+            })
+
+            const fileList = this.$refs.upload.$refs.upload.uploadFiles
+            if (fileList.every(obj => {
+              return obj.status === 'success'
+            })) {
+              this.$emit('on-success')
+            } else {
+              this.$refs.upload.$refs.upload.submit()
+            }
+          }
+        } else {
+          return false
+        }
+      })
+    },
     handleSubmit(files) {
       this.ruleForm.show = files.map(val => process.env.VUE_APP_BASE_SRC + '/show/' + val)
-      console.log(this.ruleForm.show)
       create(this.ruleForm).then(response => {
         this.$message({
           message: '新增成功',
@@ -122,7 +224,7 @@ export default {
     fetchData() {
       queryClass().then(response => {
         this.classes = response.data.map(obj => {
-          const value = obj.class
+          const value = obj.className
           return { value }
         })
       }).catch(err => {
@@ -144,7 +246,6 @@ export default {
         if (valid) {
           this.$refs.upload.$refs.upload.submit()
         } else {
-          console.log('error submit!!')
           return false
         }
       })

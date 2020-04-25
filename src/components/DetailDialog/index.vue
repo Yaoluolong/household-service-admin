@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="visible"
-    width="500px"
+    width="800px"
     @close="handleClose()"
     @closed="$emit('closed')"
   >
@@ -14,12 +14,26 @@
         <div v-for="(obj,index) in item" :key="index" style="margin:5px 0">
           <div class="detail__name">{{ obj.label }}</div>
           <span v-if="!obj.type" class="detail__value">{{ obj.value }}</span>
-          <el-image
-            v-if="obj.type==='image'"
-            style="width: 140px; height: 170px;vertical-align:top"
-            :src="obj.value"
-            fit="cover"
-          />
+          <div v-if="obj.type==='image'" style="display:inline-block">
+            <el-image
+              v-for="(item2,index2) in obj.value"
+              :key="index2"
+              style="width: 140px; height: 170px;vertical-align:top;margin-right:5px"
+              :src="item2"
+              fit="fit"
+            />
+          </div>
+          <div v-if="obj.type==='tag'" style="display:inline-block;vertical-align: middle">
+            <el-tag
+              v-for="(item2,index2) in obj.value"
+              :key="index2"
+              type="info"
+              style="margin-right:5px;height:100%"
+            >
+              <span style="margin-right:2px;float: left;font-weight:600">{{ item2.name }}</span>
+              <span style="float:right;color: #8492a6; font-size: 13px">{{ item2.staffID }}</span>
+            </el-tag>
+          </div>
         </div>
       </div>
     </slot>
@@ -27,8 +41,8 @@
       <el-button type="info" @click="isEdit=false;$emit('cancel')">取 消</el-button>
     </div>
     <div v-else slot="footer" class="dialog-footer">
-      <el-button type="danger" @click="handleRemove()">移 除</el-button>
-      <el-button type="success" @click="$emit('on-edit');isEdit=true">编 辑</el-button>
+      <el-button v-if="showButton" type="danger" @click="handleRemove()">移 除</el-button>
+      <el-button v-if="showButton" type="success" @click="$emit('on-edit');isEdit=true">编 辑</el-button>
     </div>
   </el-dialog>
 </template>
@@ -39,11 +53,13 @@ export default {
   props: {
     dialogVisible: Boolean,
     title: { type: String, required: false, default: '详情' },
-    item: { type: Array, required: false, default: null }
+    item: { type: Array, required: false, default: null },
+    edit: { type: Boolean, required: false, default: false },
+    showButton: { type: Boolean, required: false, default: true }
   },
   data() {
     return {
-      isEdit: false,
+      isEdit: this.edit,
       visible: this.dialogVisible
     }
   },
@@ -54,7 +70,7 @@ export default {
   },
   methods: {
     handleRemove() {
-      this.$confirm('确认移除该员工?', '提示', {
+      this.$confirm('确认移除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
