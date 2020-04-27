@@ -30,7 +30,7 @@
               type="info"
               style="margin-right:5px;height:100%"
             >
-              <span style="margin-right:2px;float: left;font-weight:600">{{ item2.name }}</span>
+              <span style="margin-right:5px;float: left;font-weight:600">{{ item2.name }}</span>
               <span style="float:right;color: #8492a6; font-size: 13px">{{ item2.staffID }}</span>
             </el-tag>
           </div>
