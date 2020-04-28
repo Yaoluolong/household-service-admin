@@ -64,7 +64,21 @@ export const asyncRoutes = [
         path: 'order',
         component: () => import('@/views/order/index'),
         name: 'Order',
-        meta: { title: '订单管理', icon: 'dashboard', affix: true }
+        meta: { title: '订单管理', icon: 'dashboard' }
+      }
+    ]
+  },
+  {
+    path: '/evaluate',
+    component: Layout,
+    redirect: '/evaluate',
+    meta: { title: '评价管理', icon: 'documentation' },
+    children: [
+      {
+        path: 'evaluate',
+        component: () => import('@/views/evaluate/index'),
+        name: 'Evaluate',
+        meta: { title: '评价管理', icon: 'dashboard' }
       }
     ]
   },
