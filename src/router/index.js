@@ -58,7 +58,7 @@ export const asyncRoutes = [
     path: '/order',
     component: Layout,
     redirect: '/order',
-    meta: { title: '订单管理', icon: 'documentation' },
+    meta: { title: '订单管理', icon: 'documentation', roles: ['admin', 'editor', 'manager'] },
     children: [
       {
         path: 'order',
@@ -72,7 +72,7 @@ export const asyncRoutes = [
     path: '/evaluate',
     component: Layout,
     redirect: '/evaluate',
-    meta: { title: '评价管理', icon: 'documentation' },
+    meta: { title: '评价管理', icon: 'documentation', roles: ['admin', 'editor', 'manager'] },
     children: [
       {
         path: 'evaluate',
@@ -86,7 +86,7 @@ export const asyncRoutes = [
     path: '/commodity',
     component: Layout,
     redirect: '/commodity/list',
-    meta: { title: '商品管理', icon: 'documentation' },
+    meta: { title: '商品管理', icon: 'documentation', roles: ['admin', 'editor', 'manager'] },
     children: [
       {
         path: '/commodity/list',
@@ -101,10 +101,28 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/promotion',
+    component: Layout,
+    redirect: '/promotion/list',
+    meta: { title: '活动管理', icon: 'documentation', roles: ['admin', 'editor', 'manager'] },
+    children: [
+      {
+        path: '/promotion/create',
+        component: () => import('@/views/promotion/create'),
+        meta: { title: '活动申请', icon: 'edit', roles: ['admin', 'editor', 'manager'] }
+      },
+      {
+        path: '/promotion/list',
+        component: () => import('@/views/promotion/list'),
+        meta: { title: '活动列表', icon: 'edit', roles: ['admin', 'manager'] }
+      }
+    ]
+  },
+  {
     path: '/staff',
     component: Layout,
     redirect: '/staff/list',
-    meta: { title: '员工管理', icon: 'documentation' },
+    meta: { title: '员工管理', icon: 'documentation', roles: ['admin', 'editor', 'manager'] },
     children: [
       {
         path: '/staff/list',
@@ -115,6 +133,19 @@ export const asyncRoutes = [
         path: '/staff/create',
         component: () => import('@/views/staff/create'),
         meta: { title: '员工新增', icon: 'edit' }
+      }
+    ]
+  },
+  {
+    path: '/setting',
+    component: Layout,
+    redirect: '/setting/account',
+    meta: { title: '设置', icon: 'documentation', roles: ['admin'] },
+    children: [
+      {
+        path: '/setting/account',
+        component: () => import('@/views/setting/account'),
+        meta: { title: '账号管理', icon: 'edit' }
       }
     ]
   },

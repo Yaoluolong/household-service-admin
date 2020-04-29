@@ -14,3 +14,35 @@ export function getInfo() {
     method: 'get'
   })
 }
+
+export function remove() {
+  return request({
+    url: '/user/remove',
+    method: 'post'
+  })
+}
+
+export function create() {
+  return request({
+    url: '/user/create',
+    method: 'get'
+  })
+}
+
+export function list() {
+  return request({
+    url: '/user/list',
+    method: 'get'
+  })
+}
+
+export function update(username, role) {
+  return request({
+    url: '/user/update',
+    method: 'post',
+    data: {
+      username,
+      role
+    }
+  })
+}

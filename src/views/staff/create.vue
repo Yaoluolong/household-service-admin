@@ -31,7 +31,7 @@
         />
       </el-form-item>
       <el-form-item label="简介" prop="profile">
-        <el-input v-model="ruleForm.profile" type="textarea" maxlength="30" placeholder="请输入简介" />
+        <el-input v-model="ruleForm.profile" type="textarea" maxlength="30" placeholder="请输入简介" show-word-limit />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('ruleForm')">新增</el-button>
