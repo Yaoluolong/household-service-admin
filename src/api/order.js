@@ -7,11 +7,13 @@ export function list() {
   })
 }
 
-export function update(status) {
+export function update(id, status) {
+  console.log(id + status)
   return request({
     url: '/order/update',
     method: 'post',
     data: {
+      id,
       status
     }
   })

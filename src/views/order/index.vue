@@ -23,7 +23,7 @@
         <template slot-scope="scope">{{ scope.row.contact }}</template>
       </el-table-column>
       <el-table-column label="金额" align="center" width="80">
-        <template slot-scope="scope">{{ scope.row.amout }}</template>
+        <template slot-scope="scope">{{ scope.row.amount }}</template>
       </el-table-column>
       <el-table-column label="状态" align="center" width="80">
         <template slot-scope="scope">{{ scope.row.status }}</template>
@@ -98,7 +98,7 @@ export default {
         { label: '商品编号', value: row.commodityID },
         { label: '商品类别', value: row.className },
         { label: '服务员工', value: staffs, type: 'tag' },
-        { label: '价格', value: row.price },
+        { label: '价格', value: row.amount },
         { label: '客户姓名', value: row.customerName },
         { label: '客户编号', value: row.customerID },
         { label: '联系方式', value: row.contact },
@@ -124,7 +124,7 @@ export default {
         } else if (order === '驳回') {
           newStatus = '待服务'
         }
-        update(newStatus).then(res => {
+        update(row.orderID, newStatus).then(res => {
           this.fetchData()
           this.$message({
             type: 'success',
@@ -153,7 +153,7 @@ export default {
         } else {
           newStatus = '待服务'
         }
-        update(newStatus).then(res => {
+        update(row.orderID, newStatus).then(res => {
           this.fetchData()
           this.$message({
             type: 'success',
