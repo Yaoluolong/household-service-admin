@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
-    <el-table :data="tableData" style="width: 100%" border>
-      <el-table-column label="订单编号" align="center" width="100">
+    <query word="orderID" :data="tableData" @query="(data)=>tableData=data" @reset="fetchData" />
+    <el-table :data="tableData.slice(begin,end)" style="width: 100%" border>
+      <el-table-column label="订单编号" align="center" width="130">
         <template slot-scope="scope">{{ scope.row.orderID }}</template>
       </el-table-column>
       <el-table-column label="下单时间" align="center" width="100">
@@ -10,10 +11,10 @@
       <el-table-column label="服务时间" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.serviceDate }}</template>
       </el-table-column>
-      <el-table-column label="商品名称" align="center" width="180">
+      <el-table-column label="商品名称" align="center" width="160">
         <template slot-scope="scope">{{ scope.row.commodityName }}</template>
       </el-table-column>
-      <el-table-column label="服务地址" align="center" width="350">
+      <el-table-column label="服务地址" align="center" width="340">
         <template slot-scope="scope">{{ scope.row.serviceAddress }}</template>
       </el-table-column>
       <el-table-column label="客户姓名" align="center" width="100">
@@ -38,6 +39,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <pagination :total="tableData.length" @current-change="pageChange" />
     <detail-dialog
       :dialog-visible="dialogVisible"
       :title="'订单信息详情'"
@@ -53,11 +55,17 @@ import { query } from '@/api/staff'
 import { check } from '@/utils/check-data'
 import { judge } from '@/utils/judge-status'
 import DetailDialog from '@/components/DetailDialog'
+import Query from '@/components/TabelSupport/Query'
+import Pagination from '@/components/TabelSupport/Pagination'
+import table from '@/mixins/table'
 
 export default {
   components: {
-    DetailDialog
+    DetailDialog,
+    Query,
+    Pagination
   },
+  mixins: [table],
   data() {
     return {
       item: [],

@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
-    <el-table :data="tableData" style="width: 100%" border>
+    <query word="promotionID" :data="tableData" @query="(data)=>tableData=data" @reset="fetchData" />
+    <el-table :data="tableData.slice(begin,end)" style="width: 100%" border>
       <el-table-column label="活动编号" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.promotionID }}</template>
       </el-table-column>
@@ -16,11 +17,11 @@
       <el-table-column label="活动名称" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.promotionName }}</template>
       </el-table-column>
-      <el-table-column label="活动商品" align="center" width="100">
-        <template slot-scope="scope">{{ scope.row.commodityName }}</template>
+      <el-table-column label="产品编号" align="center" width="100">
+        <template slot-scope="scope">{{ scope.row.commodityID }}</template>
       </el-table-column>
-      <el-table-column label="商品类别" align="center" width="100">
-        <template slot-scope="scope">{{ scope.row.className }}</template>
+      <el-table-column label="产品名称" align="center" width="100">
+        <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
       <el-table-column label="活动价格" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.promotionPrice }}</template>
@@ -47,14 +48,23 @@
         </template>
       </el-table-column>
     </el-table>
+    <pagination :total="tableData.length" @current-change="pageChange" />
   </div>
 </template>
 
 <script>
 import { list, update, remove } from '@/api/promotion'
 import { check } from '@/utils/check-data'
+import Query from '@/components/TabelSupport/Query'
+import Pagination from '@/components/TabelSupport/Pagination'
+import table from '@/mixins/table'
 
 export default {
+  components: {
+    Query,
+    Pagination
+  },
+  mixins: [table],
   data() {
     return {
       item: [],
@@ -91,10 +101,16 @@ export default {
           status = '移除'
           break
         case 'activate':
-          console.log(count)
           if (count.length >= 4) {
             this.$message({
               message: '激活的活动不能超过4个！',
+              type: 'warning'
+            })
+          } else if (count.some(obj => {
+            return obj.commodityID === row.commodityID
+          })) {
+            this.$message({
+              message: '此产品已存在上线活动！',
               type: 'warning'
             })
           } else { status = '已激活' }
@@ -109,7 +125,7 @@ export default {
           type: 'warning'
         }).then(() => {
           if (status !== '移除') {
-            update(row.promotionID, status).then(res => {
+            update(row.promotionID, status, row.promotionPrice, row.commodityID).then(res => {
               this.fetchData()
               this.$message({
                 message: '操作成功',

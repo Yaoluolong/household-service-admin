@@ -6,6 +6,9 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
+import { list } from '@/api/order'
+import { check } from '@/utils/check-data'
+import moment from 'moment'
 
 export default {
   mixins: [resize],
@@ -25,19 +28,39 @@ export default {
     autoResize: {
       type: Boolean,
       default: true
-    },
-    chartData: {
-      type: Object,
-      required: true
     }
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      date: [
+        moment().subtract(6, 'days'),
+        moment().subtract(5, 'days'),
+        moment().subtract(4, 'days'),
+        moment().subtract(3, 'days'),
+        moment().subtract(2, 'days'),
+        moment().subtract(1, 'days'),
+        moment()
+      ],
+      orderData: [0, 0, 0, 0, 0, 0, 0]
+    }
+  },
+  computed: {
+    week() {
+      return this.date.map(obj => {
+        const val = moment(obj).format('d')
+        return val === '0' ? '星期天'
+          : val === '1' ? '星期一'
+            : val === '2' ? '星期二'
+              : val === '3' ? '星期三'
+                : val === '4' ? '星期四'
+                  : val === '5' ? '星期五'
+                    : '星期六'
+      })
     }
   },
   watch: {
-    chartData: {
+    orderData: {
       deep: true,
       handler(val) {
         this.setOptions(val)
@@ -45,6 +68,7 @@ export default {
     }
   },
   mounted() {
+    this.fetchData()
     this.$nextTick(() => {
       this.initChart()
     })
@@ -57,76 +81,58 @@ export default {
     this.chart = null
   },
   methods: {
-    initChart() {
-      this.chart = echarts.init(this.$el, 'macarons')
-      this.setOptions(this.chartData)
+    fetchData() {
+      list().then(res => {
+        const srcData = check(res.data)
+        const temp = this.date.map(obj => {
+          const current = moment(obj).format('YYYY-MM-DD')
+          return srcData.filter(obj => {
+            return obj.orderDate === current
+          }).length
+        })
+        this.orderData = temp
+      }).catch(err => {
+        console.log(err)
+      })
     },
-    setOptions({ expectedData, actualData } = {}) {
+    initChart() {
+      this.chart = echarts.init(this.$el, 'light')
+      this.setOptions(this.orderData)
+    },
+    setOptions(orderData) {
       this.chart.setOption({
+        title: {
+          text: '最近一周的订单'
+        },
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          boundaryGap: false,
+          data: this.week,
+          boundaryGap: true,
           axisTick: {
             show: false
           }
         },
         grid: {
           left: 10,
-          right: 10,
+          right: 20,
           bottom: 20,
-          top: 30,
+          top: 40,
           containLabel: true
         },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'cross'
-          },
-          padding: [5, 10]
-        },
         yAxis: {
+          minInterval: 1,
           axisTick: {
             show: false
           }
         },
         legend: {
-          data: ['expected', 'actual']
+          data: ['数量']
         },
         series: [{
-          name: 'expected', itemStyle: {
-            normal: {
-              color: '#FF005A',
-              lineStyle: {
-                color: '#FF005A',
-                width: 2
-              }
-            }
-          },
           smooth: true,
-          type: 'line',
-          data: expectedData,
-          animationDuration: 2800,
+          type: 'bar',
+          data: orderData,
+          animationDuration: 1500,
           animationEasing: 'cubicInOut'
-        },
-        {
-          name: 'actual',
-          smooth: true,
-          type: 'line',
-          itemStyle: {
-            normal: {
-              color: '#3888fa',
-              lineStyle: {
-                color: '#3888fa',
-                width: 2
-              },
-              areaStyle: {
-                color: '#f3f8ff'
-              }
-            }
-          },
-          data: actualData,
-          animationDuration: 2800,
-          animationEasing: 'quadraticOut'
         }]
       })
     }

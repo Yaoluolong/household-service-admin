@@ -65,12 +65,12 @@ export default {
       filename: '',
       ruleForm: {
         picture: false,
-        name: '陈雁鸣',
-        sex: '女',
-        age: 20,
-        vocation: '看护',
+        name: '',
+        sex: '',
+        age: 18,
+        vocation: '',
         entryDate: '',
-        profile: '大美女'
+        profile: ''
       },
       rules: {
         picture: [{ validator: checkPicture, required: true, trigger: 'change' }],
@@ -111,6 +111,7 @@ export default {
                 profile: ''
               }
               this.$refs.ruleForm.resetFields()
+              this.$refs.upload.imageUrl = ''
             })
           }).catch(err => {
             reject(err)

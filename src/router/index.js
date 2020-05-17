@@ -86,17 +86,17 @@ export const asyncRoutes = [
     path: '/commodity',
     component: Layout,
     redirect: '/commodity/list',
-    meta: { title: '商品管理', icon: 'documentation', roles: ['admin', 'editor', 'manager'] },
+    meta: { title: '产品管理', icon: 'documentation', roles: ['admin', 'editor', 'manager'] },
     children: [
       {
         path: '/commodity/list',
         component: () => import('@/views/commodity/list'),
-        meta: { title: '商品列表', icon: 'edit' }
+        meta: { title: '产品列表', icon: 'edit' }
       },
       {
         path: '/commodity/create',
         component: () => import('@/views/commodity/create'),
-        meta: { title: '商品新增', icon: 'edit' }
+        meta: { title: '产品新增', icon: 'edit' }
       }
     ]
   },

@@ -17,13 +17,15 @@ export function replace(url) {
   })
 }
 
-export function update(id, status) {
+export function update(id, status, promotionPrice, commodityID) {
   return request({
     url: '/promotion/update',
     method: 'post',
     data: {
       id,
-      status
+      status,
+      promotionPrice,
+      commodityID
     }
   })
 }

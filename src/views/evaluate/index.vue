@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
-    <el-table :data="tableData" style="width: 100%" border>
+    <query word="evaluateID" :data="tableData" @query="(data)=>tableData=data" @reset="fetchData" />
+    <el-table :data="tableData.slice(begin,end)" style="width: 100%" border>
       <el-table-column label="评价编号" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.evaluateID }}</template>
       </el-table-column>
@@ -15,6 +16,9 @@
       </el-table-column>
       <el-table-column label="留言客户" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.customerName }}</template>
+      </el-table-column>
+      <el-table-column label="评分" align="center" width="50">
+        <template slot-scope="scope">{{ scope.row.score }}</template>
       </el-table-column>
       <el-table-column label="内容" align="center">
         <template slot-scope="scope">{{ scope.row.content }}</template>
@@ -49,15 +53,23 @@
         </template>
       </el-table-column>
     </el-table>
-
+    <pagination :total="tableData.length" @current-change="pageChange" />
   </div>
 </template>
 
 <script>
 import { list, update } from '@/api/evaluate'
 import { check } from '@/utils/check-data'
+import Query from '@/components/TabelSupport/Query'
+import Pagination from '@/components/TabelSupport/Pagination'
+import table from '@/mixins/table'
 
 export default {
+  components: {
+    Query,
+    Pagination
+  },
+  mixins: [table],
   data() {
     return {
       dialogVisible: false,

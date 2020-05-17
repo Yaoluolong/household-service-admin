@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
-    <el-table :data="tableData" style="width: 100%" border>
+    <query word="staffID" :data="tableData" @query="(data)=>tableData=data" @reset="fetchData" />
+    <el-table :data="tableData.slice(begin,end)" style="width: 100%" border>
       <el-table-column label="员工编号" align="center" width="100">
         <template slot-scope="scope">{{ scope.row.staffID }}</template>
       </el-table-column>
@@ -28,6 +29,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <pagination :total="tableData.length" @current-change="pageChange" />
     <detail-dialog
       :dialog-visible="dialogVisible"
       :item="item"
@@ -48,12 +50,18 @@ import { list, remove } from '@/api/staff'
 import { check } from '@/utils/check-data'
 import DetailDialog from '@/components/DetailDialog'
 import EditStaff from './components/EditStaff'
+import Query from '@/components/TabelSupport/Query'
+import Pagination from '@/components/TabelSupport/Pagination'
+import table from '@/mixins/table'
 
 export default {
   components: {
     DetailDialog,
-    EditStaff
+    EditStaff,
+    Query,
+    Pagination
   },
+  mixins: [table],
   data() {
     return {
       currentItem: {},

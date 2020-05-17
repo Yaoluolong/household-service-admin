@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       title: '小洛家政',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      logo: 'https://yaoluolong.xyz:8088/household-service/logo/logo.png'
     }
   }
 }

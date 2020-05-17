@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
     <el-button type="success" style="margin-bottom:20px" @click="handleCreate">新增账号</el-button>
-    <el-table :data="tableData" style="width: 100%" border>
+    <query word="username" :data="tableData" @query="(data)=>tableData=data" @reset="fetchData" />
+    <el-table :data="tableData.slice(begin,end)" style="width: 100%" border>
       <el-table-column label="账号" align="center">
         <template slot-scope="scope">{{ scope.row.username }}</template>
       </el-table-column>
@@ -40,15 +41,24 @@
         </template>
       </el-table-column>
     </el-table>
+    <pagination :total="tableData.length" @current-change="pageChange" />
   </div>
 </template>
 
 <script>
 import { check } from '@/utils/check-data'
 import { list, remove, create, update } from '@/api/user'
+import Query from '@/components/TabelSupport/Query'
+import Pagination from '@/components/TabelSupport/Pagination'
+import table from '@/mixins/table'
+
 export default {
   name: '',
-  components: {},
+  components: {
+    Query,
+    Pagination
+  },
+  mixins: [table],
   data() {
     return {
       options: ['admin', 'guest', 'manager', 'editor'],

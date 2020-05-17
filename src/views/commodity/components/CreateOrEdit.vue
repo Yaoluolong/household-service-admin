@@ -16,8 +16,8 @@
     <el-form-item v-if="ruleForm.commodityID!==''" label="商品编号">
       {{ ruleForm.commodityID }}
     </el-form-item>
-    <el-form-item label="商品价格" prop="price">
-      <el-input-number v-model="ruleForm.price" />
+    <el-form-item label="商品价格" prop="price" required>
+      <el-input-number v-model="ruleForm.price" :min="0" label="商品价格" />
     </el-form-item>
     <el-form-item label="所属分类" prop="class">
       <el-select v-model="ruleForm.class" filterable placeholder="请选择">
