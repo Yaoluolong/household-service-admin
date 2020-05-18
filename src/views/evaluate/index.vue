@@ -28,7 +28,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="80">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.feedback===''" size="mini" type="success" @click="dialogVisible=true">回复</el-button>
+          <el-button v-if="scope.row.feedback===''||scope.row.feedback===null" size="mini" type="success" @click="dialogVisible=true">回复</el-button>
           <span v-else>已回复</span>
           <el-dialog
             title="评价反馈"

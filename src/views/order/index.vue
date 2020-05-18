@@ -44,6 +44,7 @@
       :dialog-visible="dialogVisible"
       :title="'订单信息详情'"
       :item="item"
+      :show-button="false"
       @close="_=>dialogVisible=false"
     />
   </div>

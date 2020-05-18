@@ -37,7 +37,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="活动价格" prop="promotionPrice">
-        <el-input-number v-model="ruleForm.promotionPrice" />
+        <el-input-number v-model="ruleForm.promotionPrice" :min="0" />
       </el-form-item>
       <el-form-item label="活动描述" prop="describe">
         <el-input v-model="ruleForm.describe" type="textarea" maxlength="50" placeholder="请输入简介" show-word-limit />

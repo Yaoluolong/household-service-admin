@@ -1,6 +1,6 @@
 <template>
   <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px">
-    <el-form-item label="商品图片" prop="isAdded">
+    <el-form-item label="产品图片" prop="isAdded">
       <upload-picture
         ref="upload"
         :url="'/upload/show'"
@@ -10,14 +10,14 @@
         @success="judgeStatus"
       />
     </el-form-item>
-    <el-form-item label="商品名称" prop="name">
+    <el-form-item label="产品名称" prop="name">
       <el-input v-model="ruleForm.name" />
     </el-form-item>
-    <el-form-item v-if="ruleForm.commodityID!==''" label="商品编号">
+    <el-form-item v-if="ruleForm.commodityID!==''" label="产品编号">
       {{ ruleForm.commodityID }}
     </el-form-item>
-    <el-form-item label="商品价格" prop="price" required>
-      <el-input-number v-model="ruleForm.price" :min="0" label="商品价格" />
+    <el-form-item label="产品价格" prop="price" required>
+      <el-input-number v-model="ruleForm.price" :min="0" />
     </el-form-item>
     <el-form-item label="所属分类" prop="class">
       <el-select v-model="ruleForm.class" filterable placeholder="请选择">
@@ -49,8 +49,8 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="商品描述" prop="describe">
-      <el-input v-model="ruleForm.describe" type="textarea" placeholder="请输入商品描述" />
+    <el-form-item label="产品描述" prop="describe">
+      <el-input v-model="ruleForm.describe" type="textarea" placeholder="请输入产品描述" />
     </el-form-item>
     <el-form-item>
       <el-button v-if="isEdit" type="primary" @click="submitEdit('ruleForm')">确认</el-button>
@@ -65,6 +65,7 @@ import UploadPicture from './UploadPicture'
 import { queryClass } from '@/api/class'
 import { list } from '@/api/staff'
 import { create, update } from '@/api/commodity'
+import { check } from '@/utils/check-data'
 
 export default {
   name: 'CreateOrEdit',
@@ -92,23 +93,23 @@ export default {
       },
       rules: {
         isAdded: [
-          { required: true, message: '请选择商品展示图', trigger: 'blur' }
+          { required: true, message: '请选择产品展示图', trigger: 'blur' }
         ],
         name: [
-          { required: true, message: '请输入商品名称', trigger: 'blur' },
+          { required: true, message: '请输入产品名称', trigger: 'blur' },
           { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
         ],
         price: [
-          { type: 'number', required: true, message: '请输入商品价格', trigger: 'blur' }
+          { type: 'number', required: true, message: '请输入产品价格', trigger: 'blur' }
         ],
         class: [
-          { required: true, message: '请选择商品的分类', trigger: 'blur' }
+          { required: true, message: '请选择产品的分类', trigger: 'blur' }
         ],
         staff: [
-          { required: true, message: '请选择商品的可选员工', trigger: 'blur' }
+          { required: true, message: '请选择产品的可选员工', trigger: 'blur' }
         ],
         describe: [
-          { required: true, message: '请填写商品描述', trigger: 'blur' }
+          { required: true, message: '请填写产品描述', trigger: 'blur' }
         ]
       }
     }
@@ -223,7 +224,7 @@ export default {
     },
     fetchData() {
       queryClass().then(response => {
-        this.classes = response.data.map(obj => {
+        this.classes = check(response.data).map(obj => {
           const value = obj.className
           return { value }
         })
@@ -231,7 +232,7 @@ export default {
         console.log(err)
       })
       list().then(response => {
-        this.staffs = response.data.map(obj => {
+        this.staffs = check(response.data).map(obj => {
           const label = obj.name
           const value = obj.staffID
           const vocation = obj.vocation
@@ -252,6 +253,10 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+      if (!this.isEdit) {
+        this.$refs.upload.$refs.upload.clearFiles()
+        this.$refs.upload.$refs.upload.dialogImageUrl = ''
+      }
     }
   }
 }
