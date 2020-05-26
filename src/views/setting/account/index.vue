@@ -17,17 +17,17 @@
               <el-option
                 v-for="(item,index) in options"
                 :key="index"
-                :label="item"
-                :value="item"
+                :label="item.label"
+                :value="item.value"
               />
             </el-select>
           </span>
           <span v-else>
-            {{ scope.row.role }}
+            {{ switchToCN(scope.row.role) }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="300">
+      <el-table-column v-if="checkPermission(['admin','administrator'])" label="操作" align="center" width="300">
         <template slot-scope="scope">
           <span v-if="current===scope.row.username">
             <el-button size="mini" type="success" @click="submitEdit(scope.row)">确定</el-button>
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import checkPermission from '@/utils/permission'
 import { check } from '@/utils/check-data'
 import { list, remove, create, update } from '@/api/user'
 import Query from '@/components/TabelSupport/Query'
@@ -61,7 +62,28 @@ export default {
   mixins: [table],
   data() {
     return {
-      options: ['admin', 'guest', 'manager', 'editor'],
+      options: [
+        {
+          label: '总经理',
+          value: 'manager'
+        },
+        {
+          label: '策划',
+          value: 'planner'
+        },
+        {
+          label: '销售',
+          value: 'salesman'
+        },
+        {
+          label: '人事',
+          value: 'hr'
+        },
+        {
+          label: '系统管理员',
+          value: 'administrator'
+        }
+      ],
       current: '',
       newRole: '',
       tableData: []
@@ -71,6 +93,33 @@ export default {
     this.fetchData()
   },
   methods: {
+    checkPermission,
+    switchToCN(value) {
+      let label
+      switch (value) {
+        case 'admin':
+          label = '初始账号'
+          break
+        case 'manager':
+          label = '总经理'
+          break
+        case 'planner':
+          label = '策划'
+          break
+        case 'salesman':
+          label = '销售'
+          break
+        case 'hr':
+          label = '人事'
+          break
+        case 'administrator':
+          label = '系统管理员'
+          break
+        default:
+          break
+      }
+      return label
+    },
     fetchData() {
       list().then(res => {
         this.tableData = check(res.data)
@@ -99,7 +148,7 @@ export default {
         }
       } else {
         this.$message({
-          message: '无法修改管理账号权限',
+          message: '无法修改初始账号权限',
           type: 'error'
         })
       }

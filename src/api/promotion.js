@@ -7,6 +7,16 @@ export function list() {
   })
 }
 
+export function queryPromotion(id) {
+  return request({
+    url: '/promotion/query',
+    method: 'post',
+    data: {
+      id
+    }
+  })
+}
+
 export function replace(url) {
   return request({
     url: '/promotion/replace',

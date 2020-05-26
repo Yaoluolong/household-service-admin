@@ -17,7 +17,7 @@
         </el-upload>
       </el-form-item>
       <el-form-item label="活动名称" prop="promotionName">
-        <el-input v-model="ruleForm.promotionName" placeholder="请输入姓名" />
+        <el-input v-model="ruleForm.promotionName" placeholder="请输入活动名称" />
       </el-form-item>
       <el-form-item label="活动商品" prop="commodityID">
         <el-select

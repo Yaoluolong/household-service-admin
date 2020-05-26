@@ -15,10 +15,13 @@ export function getInfo() {
   })
 }
 
-export function remove() {
+export function remove(username) {
   return request({
     url: '/user/remove',
-    method: 'post'
+    method: 'post',
+    data: {
+      username
+    }
   })
 }
 

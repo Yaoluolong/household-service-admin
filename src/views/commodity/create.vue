@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h2>商品新增</h2>
+    <h2>产品新增</h2>
     <el-divider />
     <create-or-edit />
   </div>

@@ -40,7 +40,7 @@
     <div v-if="isEdit" slot="footer" class="dialog-footer">
       <el-button type="info" @click="isEdit=false;$emit('cancel')">取 消</el-button>
     </div>
-    <div v-else slot="footer" class="dialog-footer">
+    <div v-else-if="checkPermission(['admin','planner','salesman','hr'])" slot="footer" class="dialog-footer">
       <el-button v-if="showButton" type="danger" @click="handleRemove()">移 除</el-button>
       <el-button v-if="showButton" type="success" @click="$emit('on-edit');isEdit=true">编 辑</el-button>
     </div>
@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import checkPermission from '@/utils/permission'
 export default {
   name: 'DetailsDialog',
   props: {
@@ -69,6 +70,7 @@ export default {
     }
   },
   methods: {
+    checkPermission,
     handleRemove() {
       this.$confirm('确认移除?', '提示', {
         confirmButtonText: '确定',

@@ -14,7 +14,7 @@
       <el-table-column label="商品名称" align="center" width="160">
         <template slot-scope="scope">{{ scope.row.commodityName }}</template>
       </el-table-column>
-      <el-table-column label="服务地址" align="center" width="340">
+      <el-table-column label="服务地址" align="center">
         <template slot-scope="scope">{{ scope.row.serviceAddress }}</template>
       </el-table-column>
       <el-table-column label="客户姓名" align="center" width="100">
@@ -29,7 +29,7 @@
       <el-table-column label="状态" align="center" width="80">
         <template slot-scope="scope">{{ scope.row.status }}</template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230">
+      <el-table-column v-if="checkPermission(['admin','salesman'])" label="操作" align="center" width="230">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
           <span v-show="switchBtn(scope.row.status).visible">
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import checkPermission from '@/utils/permission'
 import { list, update } from '@/api/order'
 import { query } from '@/api/staff'
 import { check } from '@/utils/check-data'
@@ -78,6 +79,7 @@ export default {
     this.fetchData()
   },
   methods: {
+    checkPermission,
     switchBtn(status) {
       return judge(status)
     },

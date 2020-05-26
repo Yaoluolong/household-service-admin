@@ -58,6 +58,7 @@
 <script>
 import CountTo from 'vue-count-to'
 import { staffCount, evaluateCount, promotionCount, commodityCount } from '@/api/dashboard'
+import { check } from '@/utils/check-data'
 
 export default {
   components: {
@@ -82,7 +83,9 @@ export default {
         console.log(err)
       })
       evaluateCount().then(res => {
-        this.evaluate = res.data.count
+        this.evaluate = check(res.data).filter(obj => {
+          return obj.feedback === null
+        }).length
       }).catch(err => {
         console.log(err)
       })

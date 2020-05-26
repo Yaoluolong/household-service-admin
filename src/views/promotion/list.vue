@@ -34,15 +34,15 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="230">
         <template slot-scope="scope">
-          <span v-if="scope.row.status==='待审核'">
+          <span v-if="scope.row.status==='待审核'&&checkPermission(['admin','manager'])">
             <el-button size="mini" type="success" @click="handleOperation(scope.row,'resolve')">通过</el-button>
             <el-button size="mini" type="danger" @click="handleOperation(scope.row,'reject')">驳回</el-button>
           </span>
-          <span v-else-if="scope.row.status==='待激活'">
+          <span v-else-if="scope.row.status==='待激活'&&checkPermission(['admin','planner'])">
             <el-button size="mini" type="success" @click="handleOperation(scope.row,'activate')">激活</el-button>
             <el-button size="mini" type="danger" @click="handleOperation(scope.row,'reject')">移除</el-button>
           </span>
-          <span v-else>
+          <span v-else-if="checkPermission(['admin','planner'])">
             <el-button size="mini" type="warning" @click="handleOperation(scope.row,'inactivate')">失活</el-button>
           </span>
         </template>
@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import checkPermission from '@/utils/permission'
 import { list, update, remove } from '@/api/promotion'
 import { check } from '@/utils/check-data'
 import Query from '@/components/TabelSupport/Query'
@@ -76,6 +77,7 @@ export default {
     this.fetchData()
   },
   methods: {
+    checkPermission,
     fetchData() {
       list()
         .then(result => {

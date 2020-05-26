@@ -7,11 +7,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import adminDashboard from './admin'
-import guestDashboard from './guest'
 
 export default {
   name: 'Dashboard',
-  components: { adminDashboard, guestDashboard },
+  components: { adminDashboard },
   data() {
     return {
       currentRole: 'adminDashboard'

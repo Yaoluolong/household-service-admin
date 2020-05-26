@@ -43,6 +43,7 @@
 import DetailDialog from '@/components/DetailDialog'
 import CreateOrEdit from './CreateOrEdit'
 import { query } from '@/api/staff'
+import { queryPromotion } from '@/api/promotion'
 import { remove } from '@/api/commodity'
 
 export default {
@@ -89,12 +90,23 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        remove(obj.commodityID, obj.show).then(result => {
-          this.$message({
-            type: 'success',
-            message: '移除成功!'
-          })
-          this.$emit('on-remove')
+        queryPromotion(obj.commodityID).then(result => {
+          if (result.data.length !== 0) {
+            this.$message({
+              type: 'warning',
+              message: '存在涉及此产品的活动，无法移除!'
+            })
+          } else {
+            remove(obj.commodityID, obj.show).then(result => {
+              this.$message({
+                type: 'success',
+                message: '移除成功!'
+              })
+              this.$emit('on-remove')
+            }).catch(err => {
+              console.log(err)
+            })
+          }
         }).catch(err => {
           console.log(err)
         })

@@ -26,9 +26,9 @@
       <el-table-column label="反馈" align="center">
         <template slot-scope="scope">{{ scope.row.feedback }}</template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="80">
+      <el-table-column v-if="checkPermission(['admin','salesman'])" label="操作" align="center" width="80">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.feedback===''||scope.row.feedback===null" size="mini" type="success" @click="dialogVisible=true">回复</el-button>
+          <el-button v-if="scope.row.feedback===''||scope.row.feedback===null" size="mini" type="success" @click="dialogVisible=true;currentItem=scope.row">回复</el-button>
           <span v-else>已回复</span>
           <el-dialog
             title="评价反馈"
@@ -47,7 +47,7 @@
             </div>
             <span slot="footer" class="dialog-footer">
               <el-button @click="dialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="handleReply(scope.row)">确 定</el-button>
+              <el-button type="primary" @click="handleReply(currentItem)">确 定</el-button>
             </span>
           </el-dialog>
         </template>
@@ -58,6 +58,7 @@
 </template>
 
 <script>
+import checkPermission from '@/utils/permission'
 import { list, update } from '@/api/evaluate'
 import { check } from '@/utils/check-data'
 import Query from '@/components/TabelSupport/Query'
@@ -74,21 +75,25 @@ export default {
     return {
       dialogVisible: false,
       textarea: '',
-      tableData: []
+      tableData: [],
+      currentItem: {}
     }
   },
   mounted() {
     this.fetchData()
   },
   methods: {
+    checkPermission,
     fetchData() {
       list().then(res => {
         this.tableData = check(res.data)
+        this.textarea = ''
       }).catch(err => {
         console.log(err)
       })
     },
     handleReply(row) {
+      console.log(row.evaluateID)
       if (this.textarea.trim() === '') {
         this.$message({
           message: '输入不能为空',
